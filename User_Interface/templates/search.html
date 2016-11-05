@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<head>
+    <title>Index page</title>
+</head>
+<body>
+    <div id="header">
+    	<h1>Active Region Database</h1>
+    </div>
+    <div id="content">
+        <p>Enter Noaa Number:</p>
+        <form action="/ActiveRegionDatabase/" method="post" accept-charset="utf-8" onsubmit="this.action+=this.querySelector('input[type=text]').value">
+            {% csrf_token %}
+            <input type="text" name="Active Region">
+            <input type="submit" value="Enter">
+        </form>
+    </div>
+</body>

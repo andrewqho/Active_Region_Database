@@ -1,0 +1,64 @@
+{% load staticfiles %}
+
+<!doctype html>
+<html>
+    <head>
+        <script type="text/javascript" src="http://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script> 
+        <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+        <script type="text/javascript" src="https://mpld3.github.io/js/mpld3.v0.2.js"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'AR_Database/display.css' %}"/>
+    </head>
+    <body>
+        <div id="header">
+            <h1>Active Region Database</h1>
+        </div>
+        <div id="search">
+            <form action="/ActiveRegionDatabase/" method="post" accept-charset="utf-8" onsubmit="this.action+=this.querySelector('input[type=text]').value">
+                {% csrf_token %}
+                <input type="text" name="Active Region">
+                <input type="submit" value="Enter">
+                <!-- Submission section to go to new active region -->
+            </form>
+        </div>
+        <div class= "MPLD3_Graph">
+            <div id="Figure" style = 'float:right'>       
+                <script type="text/javascript">
+                    graph = {{ Graph|safe }};
+                    mpld3.draw_figure("Figure", graph);
+                    // Graphs based on data passed in through render_to_response
+                </script>
+            </div>
+        </div>
+        <div class="Tables">
+            <div id="IRIS_Table">
+                <h3>IRIS Observations</h3>
+                <table class='sortable'> 
+                <!-- Allows tables to be sorted -->
+                    <tr>
+                        <th>Date And Time</th>
+                        <th>X Cen</th>
+                        <th>Y Cen</th>
+                        <th>X-FOV</th>
+                        <th>Y-FOV</th>
+                        <th>Science Objectives</th>
+                    </tr>
+                    {% for observation in Table %}
+                    <!-- For every observation passed in through redner_to_response, add the following data to the table-->
+                    <tr> 
+                        <td>{{ observation.dateAndTime }}</td>
+                        <td>{{ observation.xcen }}</td>
+                        <td>{{ observation.ycen }}</td>
+                        <td>{{ observation.xfov }}</td>
+                        <td>{{ observation.yfov }}</td>
+                        <td>{{ observation.sciObj }}</td>
+                    </tr>  
+                    {% endfor %}
+                </table>
+            </div>
+            <div id="HMI_Table">
+                <h3>HMI DataSeries</h3>
+            </div>
+            <!-- When I get the file from Matthew, can add the HMI data series -->
+        </div>
+    </body>
+</html>
