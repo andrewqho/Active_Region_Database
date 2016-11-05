@@ -1,4 +1,4 @@
-# Active_Region_Database
+# The Active Region Database
 
 This project uses Django and Matplotlib to provide a simple, clean active region database. 
 
@@ -29,3 +29,31 @@ After the file "manage.py" confirms there are no errors, copy the given server i
 (http example server)/Active Region Database
 
 After completing the following instructions, you are free to try out the database!
+
+# How the code works:
+
+Django uses several directories known as "apps" to run. Within the code, I have two apps: "User_Interface" and "Utility". 
+
+"Utility" contains all the configuration files necessary for Django to properly read other "apps". 
+
+In User_Interface, there are several scripts that run. First, when the webpage is pulled up, the file "urls.py" uses regular expressions to invoke a different methods within the file, "views.py". Within "urls.py", there are 2 different urls possible:
+/ActiveRegionDatabase/ or /ActiveRegionDatabase/NoaaNumber
+
+The start page, "/ActiveRegionDatabase/" takes a simple user request and outputs the graph of the corresponding active region.
+In urls.py, you see the following line of code:
+    
+    url(r'^ActiveRegionDatabase/(?P<noaaNmbr>[0-9]{5})', views.display, name = 'display'),
+    url(r'^ActiveRegionDatabase', views.search, name = 'search'),
+
+Essentially, this line of code dictates how the program runs based off of the URL:
+1. If the URL matches "/ActiveRegionDatabase", then invoke the method "search" within view.py
+2. If the URL matches "/ActiveRegionDatabase/someNOAAnumber", then invoke the method "display" within views.py
+
+Within views.py, there are two major functions that can be invoked: search and display
+
+Search is defined as the following:
+
+    def search(request):
+        return render(request, 'search.html')
+        
+Django uses the built-in function "render" to send data to the HTML file, search.html. The request, taken from sending the url data to the server, is returned to the html file to be shown in the browser.
