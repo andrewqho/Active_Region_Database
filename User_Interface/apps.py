@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class UserInterfaceConfig(AppConfig):
+class User_InterfaceConfig(AppConfig):
     name = 'User_Interface'
