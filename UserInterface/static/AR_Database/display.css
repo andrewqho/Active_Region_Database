@@ -1,0 +1,12 @@
+div.Tables{
+	vertical-align: top;
+	display:inline-block;
+    float:left;
+}
+
+div.MPLD3_Graph{
+	vertical-align: top;
+	display:inline-block;
+    float:left;	
+}
+
