@@ -31,8 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'User_Interface.apps.UserInterfaceConfig',
-    'UserInterface.apps.UserinterfaceConfig'
+    'UserInterface.apps.UserinterfaceConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +50,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'User_Interface.urls'
+ROOT_URLCONF = 'UserInterface.urls'
 
 TEMPLATES = [
     {
