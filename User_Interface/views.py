@@ -19,7 +19,6 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.patches import Rectangle, Circle, PathPatch
 from matplotlib.path import Path
-from matplotlib.transforms import Affine2D
 import numpy as np
 import pylab
 import sunpy.time
@@ -27,7 +26,9 @@ import numpy as np
 from adjustText import adjust_text
 import pandas as pd
 from scipy import interpolate
-import shutil
+import datetime
+from sunpy import wcs
+from sunpy import sun
 
 from .tables import HEK_Table
 
@@ -59,7 +60,7 @@ lonMax = []
 
 def getInfoHEK(counter, hekJSON):
     for counter in range(len(hekJSON["Events"])):
-        dateAndTimeHEK.append(hekJSON["Events"][counter]["startTime"])
+        dateAndTimeHEK.append(convertTimesHEK(hekJSON["Events"][counter]["startTime"]))
         xcen.append(float("%.2f" % hekJSON["Events"][counter]["xCen"]))
         ycen.append(float("%.2f" % hekJSON["Events"][counter]["yCen"]))
         xfov.append(float("%.2f" % hekJSON["Events"][counter]["raster_fovx"]))
@@ -75,7 +76,7 @@ def getInfoHMI(index, JSOC_Dict, noaaNmbr):
             counter = counter+1
     a = findClosestEntry(index, temp)
 
-    dateAndTime.append(convertTimes(temp[a][1]))
+    dateAndTimeHMI.append(convertTimesHMI(temp[a][1]))
     latMin.append(float("%.2f" % float(temp[a][2])))
     lonMin.append(float("%.2f" % float(temp[a][3])))
     latMax.append(float("%.2f" % float(temp[a][4])))
@@ -171,12 +172,12 @@ def setUpperTimeBound(i):
     return upperBound
 
 def findClosestEntry(index, JSOC_Dict):
-    difference1 = abs(dateAndTimeHEK[index]- convertTimes(JSOC_Dict[0][1]))
+    difference1 = abs(dateAndTimeHEK[index]- convertTimesHMI(JSOC_Dict[0][1]))
     cont = True
     counter = 1
     while cont:
         try:
-            difference2 = abs(dateAndTimeHEK[index] - convertTimes(JSOC_Dict[counter][1]))
+            difference2 = abs(dateAndTimeHEK[index] - convertTimesHMI(JSOC_Dict[counter][1]))
             if difference2 < difference1:
                 difference1 = difference2
                 closestIndex = counter
@@ -191,7 +192,11 @@ def HGToHPC(x, y, t):
     hpc = wcs.convert_hg_hpc(carringtonLongitude, y)
     return hpc
 
-def convertTimes(dateAndTime):
+def convertTimesHEK(dateAndTime):
+    dateTime = datetime.datetime.strptime(dateAndTime, '%Y-%m-%d %H:%M:%S')
+    return dateTime
+
+def convertTimesHMI(dateAndTime):
     dateTime = datetime.datetime.strptime(dateAndTime, '%Y.%m.%d_%H:%M:%S_TAI')
     return dateTime
 
@@ -203,6 +208,12 @@ def reset():
     del yfov [:]
     del sciObj [:]
 
+    del dateAndTimeHMI [:]
+    del lonMin [:]
+    del lonMax [:]
+    del latMin [:]
+    del latMax [:]
+
 def makeGraph(noaaNmbr):
     fig, ax = plt.subplots(figsize=(8,8))
     # plt.plot(xcen, ycen, linestyle="dashed", color="red")
@@ -212,11 +223,11 @@ def makeGraph(noaaNmbr):
     # circle = Circle((0, 0), 980 , facecolor='none', edgecolor=(0, 0.8, 0.8), linewidth=3, alpha=0.5)
 
     for i in range(len(dateAndTimeHMI)):
-        xStart = stanfordJSOC.lonMin[i]
-        yStart = stanfordJSOC.latMin[i]
+        xStart = lonMin[i]
+        yStart = latMin[i]
         
-        xLength = stanfordJSOC.lonMax[i] - stanfordJSOC.lonMin[i]
-        yLength = stanfordJSOC.latMax[i] - stanfordJSOC.latMin[i]
+        xLength = lonMax[i] - lonMin[i]
+        yLength = latMax[i] - latMin[i]
         
         ax.add_patch(Rectangle((xStart, yStart), xLength, yLength, edgecolor = 'blue', facecolor='none'))
 
@@ -244,9 +255,9 @@ def makeGraph(noaaNmbr):
 
     return js_data
 
-def makeTable(noaaNmbr):
+def makeHEKTable(noaaNmbr):
     if models.HEK_Observations.objects.filter(noaaNmbr=noaaNmbr).count() == 0:
-        for i in range(len(hekJSON["Events"])):
+        for i in range(len(dateAndTimeHEK)):
             observation = models.HEK_Observations(noaaNmbr=noaaNmbr, 
                                                 dateAndTime=dateAndTimeHEK[i], 
                                                 xcen=xcen[i], 
@@ -257,6 +268,21 @@ def makeTable(noaaNmbr):
             observation.save()
 
     table = models.HEK_Observations.objects.filter(noaaNmbr=noaaNmbr)
+
+    return table
+
+def makeHMITable(noaaNmbr):
+    if models.HMI_DataSeries.objects.filter(noaaNmbr=noaaNmbr).count() == 0:
+        for i in range(len(dateAndTimeHMI)):
+            observation = models.HMI_DataSeries(noaaNmbr=noaaNmbr, 
+                                                dateAndTime=dateAndTimeHMI[i], 
+                                                lonMin=lonMin[i], 
+                                                lonMax=lonMax[i], 
+                                                latMin=latMin[i], 
+                                                latMax=latMax[i])
+            observation.save()
+
+    table = models.HMI_DataSeries.objects.filter(noaaNmbr=noaaNmbr)
 
     return table
 
@@ -285,13 +311,11 @@ def display(request, noaaNmbr):
 
     urlDataJSOC = 'http://jsoc.stanford.edu/cgi-bin/ajax/jsoc_info'
     for i in range(len(dateAndTimeHEK)):
-        JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=stanfordJSOC.setLowerTimeBound(i), end_or_span=stanfordJSOC.setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX']) 
+        JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=setLowerTimeBound(i), end_or_span=setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX']) 
         print(JSOC_Dict)
-        stanfordJSOC.getInfoHMI(i, JSOC_Dict, noaaNmbr)
+        getInfoHMI(i, JSOC_Dict, noaaNmbr)
 
     sortHMI()
 
-    print(dateAndTimeHMI)
-
-    return render(request, 'display.html', {"Graph": makeGraph(noaaNmbr), "Table": makeTable(noaaNmbr)})
+    return render(request, 'display.html', {"Graph": makeGraph(noaaNmbr), "HEKTable": makeHEKTable(noaaNmbr), "HMITable": makeHMITable(noaaNmbr)})
 

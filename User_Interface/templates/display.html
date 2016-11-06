@@ -42,21 +42,41 @@
                         <th>Y-FOV</th>
                         <th>Science Objectives</th>
                     </tr>
-                    {% for observation in Table %}
+                    {% for a in HEKTable %}
                     <!-- For every observation passed in through redner_to_response, add the following data to the table-->
                     <tr> 
-                        <td>{{ observation.dateAndTime }}</td>
-                        <td>{{ observation.xcen }}</td>
-                        <td>{{ observation.ycen }}</td>
-                        <td>{{ observation.xfov }}</td>
-                        <td>{{ observation.yfov }}</td>
-                        <td>{{ observation.sciObj }}</td>
+                        <td>{{ a.dateAndTime }}</td>
+                        <td>{{ a.xcen }}</td>
+                        <td>{{ a.ycen }}</td>
+                        <td>{{ a.xfov }}</td>
+                        <td>{{ a.yfov }}</td>
+                        <td>{{ a.sciObj }}</td>
                     </tr>  
                     {% endfor %}
                 </table>
             </div>
             <div id="HMI_Table">
-                <h3>HMI DataSeries</h3>
+                <table class='sortable'> 
+                <!-- Allows tables to be sorted -->
+                    <tr>
+                        <th>Date And Time</th>
+                        <th>Min Lon</th>
+                        <th>Max Lon</th>
+                        <th>Min Lat</th>
+                        <th>Max Lat</th>
+                    </tr>
+                    {% for b in HMITable %}
+                    <!-- For every observation passed in through redner_to_response, add the following data to the table-->
+                    <tr> 
+                        <td>{{ b.dateAndTime }}</td>
+                        <td>{{ b.xcen }}</td>
+                        <td>{{ b.ycen }}</td>
+                        <td>{{ b.xfov }}</td>
+                        <td>{{ b.yfov }}</td>
+                        <td>{{ b.sciObj }}</td>
+                    </tr>  
+                    {% endfor %}
+                </table>
             </div>
             <!-- When I get the file from Matthew, can add the HMI data series -->
         </div>
