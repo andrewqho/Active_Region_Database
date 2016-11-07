@@ -258,14 +258,14 @@ def makeGraph(noaaNmbr):
 def makeHEKTable(noaaNmbr):
     if models.HEK_Observations.objects.filter(noaaNmbr=noaaNmbr).count() == 0:
         for i in range(len(dateAndTimeHEK)):
-            observation = models.HEK_Observations(noaaNmbr=noaaNmbr, 
+            a = models.HEK_Observations(noaaNmbr=noaaNmbr, 
                                                 dateAndTime=dateAndTimeHEK[i], 
                                                 xcen=xcen[i], 
                                                 ycen=ycen[i], 
                                                 xfov=xfov[i], 
                                                 yfov=yfov[i], 
                                                 sciObj=sciObj[i])
-            observation.save()
+            a.save()
 
     table = models.HEK_Observations.objects.filter(noaaNmbr=noaaNmbr)
 
@@ -274,13 +274,13 @@ def makeHEKTable(noaaNmbr):
 def makeHMITable(noaaNmbr):
     if models.HMI_DataSeries.objects.filter(noaaNmbr=noaaNmbr).count() == 0:
         for i in range(len(dateAndTimeHMI)):
-            observation = models.HMI_DataSeries(noaaNmbr=noaaNmbr, 
-                                                dateAndTime=dateAndTimeHMI[i], 
-                                                lonMin=lonMin[i], 
-                                                lonMax=lonMax[i], 
-                                                latMin=latMin[i], 
-                                                latMax=latMax[i])
-            observation.save()
+            b = models.HMI_DataSeries(noaaNmbr=noaaNmbr, 
+                                    dateAndTime=dateAndTimeHMI[i], 
+                                    latMin=latMin[i], 
+                                    latMax=latMax[i],
+                                    lonMin=lonMin[i], 
+                                    lonMax=lonMax[i])
+            b.save()
 
     table = models.HMI_DataSeries.objects.filter(noaaNmbr=noaaNmbr)
 
@@ -312,10 +312,7 @@ def display(request, noaaNmbr):
     urlDataJSOC = 'http://jsoc.stanford.edu/cgi-bin/ajax/jsoc_info'
     for i in range(len(dateAndTimeHEK)):
         JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=setLowerTimeBound(i), end_or_span=setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX']) 
-        print(JSOC_Dict)
         getInfoHMI(i, JSOC_Dict, noaaNmbr)
-
+    print(JSOC_Dict)
     sortHMI()
-
     return render(request, 'display.html', {"Graph": makeGraph(noaaNmbr), "HEKTable": makeHEKTable(noaaNmbr), "HMITable": makeHMITable(noaaNmbr)})
-

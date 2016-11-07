@@ -56,24 +56,24 @@
                 </table>
             </div>
             <div id="HMI_Table">
+                <h3>HARP Data Series</h3>
                 <table class='sortable'> 
                 <!-- Allows tables to be sorted -->
                     <tr>
                         <th>Date And Time</th>
-                        <th>Min Lon</th>
-                        <th>Max Lon</th>
-                        <th>Min Lat</th>
-                        <th>Max Lat</th>
+                        <th>Min Longitude</th>
+                        <th>Max Longitude</th>
+                        <th>Min Latitude</th>
+                        <th>Max Latitude</th>
                     </tr>
                     {% for b in HMITable %}
                     <!-- For every observation passed in through redner_to_response, add the following data to the table-->
                     <tr> 
                         <td>{{ b.dateAndTime }}</td>
-                        <td>{{ b.xcen }}</td>
-                        <td>{{ b.ycen }}</td>
-                        <td>{{ b.xfov }}</td>
-                        <td>{{ b.yfov }}</td>
-                        <td>{{ b.sciObj }}</td>
+                        <td>{{ b.lonMin }}</td>
+                        <td>{{ b.lonMax }}</td>
+                        <td>{{ b.latMin }}</td>
+                        <td>{{ b.latMax }}</td>
                     </tr>  
                     {% endfor %}
                 </table>
