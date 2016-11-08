@@ -16,17 +16,18 @@ http://matplotlib.org/faq/installing_faq.html
 
 After downloading the necessary materials, navigate the project's directory in your command line, and input the following command:
 
-python manage.py makemigrations
+    python manage.py makemigrations
 
 After migrations have been made, input the following command:
 python manage.py migrate
 
 Finally, to locally host the website, input the following command:
-python manage.py runserver
+
+    python manage.py runserver
 
 After the file "manage.py" confirms there are no errors, copy the given server into your local host and navigate to the local server. After the server name, type the following url:
 
-(http example server)/Active Region Database
+    (http example server)/ActiveRegionDatabase
 
 After completing the following instructions, you are free to try out the database!
 
