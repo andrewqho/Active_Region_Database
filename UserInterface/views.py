@@ -307,12 +307,12 @@ def display(request, noaaNmbr):
     if len(dateAndTimeHEK) == 0:
         return render(request, 'empty.html')
 
-    sortHEK()
+    # sortHEK()
 
     urlDataJSOC = 'http://jsoc.stanford.edu/cgi-bin/ajax/jsoc_info'
     for i in range(len(dateAndTimeHEK)):
         JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=setLowerTimeBound(i), end_or_span=setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX']) 
         getInfoHMI(i, JSOC_Dict, noaaNmbr)
     print(JSOC_Dict)
-    sortHMI()
+    # sortHMI()
     return render(request, 'display.html', {"Graph": makeGraph(noaaNmbr), "HEKTable": makeHEKTable(noaaNmbr), "HMITable": makeHMITable(noaaNmbr)})
