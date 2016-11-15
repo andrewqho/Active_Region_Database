@@ -218,8 +218,8 @@ def makeGraph(noaaNmbr):
     fig, ax = plt.subplots(figsize=(8,8))
     # plt.plot(xcen, ycen, linestyle="dashed", color="red")
     # plt.plot(xcen, ycen, 'ro', color = 'blue')
-    plt.plot(xcen, ycen, linestyle="dashed", color="red")
-    plt.plot(xcen, ycen, 'ro', color = 'blue')
+    ax.plot(xcen, ycen, linestyle="dashed", color="red")
+    ax.plot(xcen, ycen, 'ro', color = 'blue')
     # circle = Circle((0, 0), 980 , facecolor='none', edgecolor=(0, 0.8, 0.8), linewidth=3, alpha=0.5)
 
     for i in range(len(dateAndTimeHMI)):
@@ -244,13 +244,15 @@ def makeGraph(noaaNmbr):
     #         ax.add_patch(Rectangle((xStart, yStart), xfov[i], yfov[i], facecolor='none'))
 
     # ax.grid(True)
-    plt.axis('equal')
+    ax.axis('equal')
 
     ax.grid(True)
-    plt.gca().set_aspect('equal', adjustable='box')
+    ax.gca().set_aspect('equal', adjustable='box')
 
     ax.set_title("Active Region:" + " " + noaaNmbr, size=30)
     
+    plugins.clear(fig)
+
     js_data = json.dumps(mpld3.fig_to_dict(fig))
 
     return js_data

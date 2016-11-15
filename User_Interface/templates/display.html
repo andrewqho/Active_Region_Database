@@ -69,11 +69,10 @@
                     <!-- For every observation passed in through redner_to_response, add the following data to the table-->
                     <tr> 
                         <td>{{ b.dateAndTime }}</td>
-                        <td>{{ b.xcen }}</td>
-                        <td>{{ b.ycen }}</td>
-                        <td>{{ b.xfov }}</td>
-                        <td>{{ b.yfov }}</td>
-                        <td>{{ b.sciObj }}</td>
+                        <td>{{ b.lonMin }}</td>
+                        <td>{{ b.lonMax }}</td>
+                        <td>{{ b.latMin }}</td>
+                        <td>{{ b.latMax }}</td>
                     </tr>  
                     {% endfor %}
                 </table>
