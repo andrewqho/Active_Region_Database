@@ -140,7 +140,7 @@ def sortHMI():
                 
                 temp5 = lonMax[j]
                 lonMax[j] = lonMax[j-1]
-                yfov[j-1]=temp5
+                lonMax[j-1]=temp5
 
 def createAnnotations(hekJSON, noaaNmbr):
     annotations = []
