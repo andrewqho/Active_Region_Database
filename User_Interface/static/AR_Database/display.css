@@ -1,7 +1,7 @@
 div.Tables{
 	vertical-align: top;
 	display:inline-block;
-    float:left;
+    float:right;
 }
 
 div.MPLD3_Graph{
@@ -10,3 +10,9 @@ div.MPLD3_Graph{
     float:left;	
 }
 
+.MPLD3_Graph path {
+    pointer-events: none;
+}
+.MPLD3_Graph path.mpld3-path {
+    pointer-events: auto;
+}

@@ -21,15 +21,77 @@
             </form>
         </div>
         <div class= "MPLD3_Graph">
-            <div id="Figure" style = 'float:right'>       
+            <script>
+                function hideCombined() {
+                    var x = document.getElementById('Combined_Graph');
+                    var elem = document.getElementById("button1");
+        
+                    if (x.style.display === 'none') {
+                        elem.value = "Hide Graph";
+                        x.style.display = 'block';
+                    } 
+                    else {
+                        elem.value = "Show Graph";
+                        x.style.display = 'none';
+                    }
+                }
+                function hideIRIS() {
+                    var x = document.getElementById('IRIS_Graph');
+                    var elem = document.getElementById("button2");
+
+                    if (x.style.display === 'none') {
+                        elem.value = "Hide IRIS Graph";
+                        x.style.display = 'block';
+                    } 
+                    else {
+                        elem.value = "Show IRIS Graph";
+                        x.style.display = 'none';
+                    }
+                }
+                function hideHMI() {
+                    var x = document.getElementById('HMI_Graph');
+                    var elem = document.getElementById("button3");
+
+                    if (x.style.display === 'none') {
+                        x.style.display = 'block';
+                        elem.value = "Hide HMI Graph";
+                    } 
+                    else {
+                        elem.value = "Show HMI Graph";
+                        x.style.display = 'none';
+                    }
+                }
+            </script>
+            <div id="Combined_Graph">
                 <script type="text/javascript">
-                    graph = {{ Graph|safe }};
-                    mpld3.draw_figure("Figure", graph);
+                    Combined_Graph = {{ Combined_Graph|safe }};
+                    mpld3.draw_figure("Combined_Graph", Combined_Graph);
                     // Graphs based on data passed in through render_to_response
                 </script>
             </div>
+            <div id="hideCombined">
+                <button onclick="hideCombined()" id="button1">Hide/Show Graph</button>
+            </div>
+            <div id="IRIS_Graph">
+                <script type = "text/javascript">
+                    IRIS_Graph = {{ IRIS_Graph|safe }};
+                    mpld3.draw_figure("IRIS_Graph", IRIS_Graph);
+                </script>
+            </div>
+            <div id="hideIRIS">
+                <button onclick="hideIRIS()" id="button2">Hide/Show IRIS Graph</button>
+            </div>
+            <div id="HMI_Graph">
+                <script type = "text/javascript">
+                    HMI_Graph = {{ HMI_Graph|safe }};
+                    mpld3.draw_figure("HMI_Graph", HMI_Graph);
+                </script>
+            </div>
+            <div style="padding-bottom: 2cm"id="hideHMI">
+                <button onclick="hideHMI()" id="button3">Hide/Show HMI Graph</button>
+            </div>
         </div>
-        <div class="Tables">
+        <div style="position:fixed" class="Tables">
             <div id="IRIS_Table">
                 <h3>IRIS Observations</h3>
                 <table class='sortable'> 
@@ -78,7 +140,6 @@
                     {% endfor %}
                 </table>
             </div>
-            <!-- When I get the file from Matthew, can add the HMI data series -->
         </div>
     </body>
 </html>

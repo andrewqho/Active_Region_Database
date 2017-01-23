@@ -58,29 +58,29 @@ lonMax = []
 
 @csrf_exempt
 
-def getInfoHEK(counter, hekJSON):
-    for counter in range(len(hekJSON["Events"])):
-        dateAndTimeHEK.append(convertTimesHEK(hekJSON["Events"][counter]["startTime"]))
-        xcen.append(float("%.2f" % hekJSON["Events"][counter]["xCen"]))
-        ycen.append(float("%.2f" % hekJSON["Events"][counter]["yCen"]))
-        xfov.append(float("%.2f" % hekJSON["Events"][counter]["raster_fovx"]))
-        yfov.append(float("%.2f" % hekJSON["Events"][counter]["raster_fovy"]))
-        sciObj.append(hekJSON["Events"][counter]["sciObjectives"])
+def getInfoHEK(hekJSON):
+    for i in range(len(hekJSON["Events"])):
+        dateAndTimeHEK.append(convertTimesHEK(hekJSON["Events"][i]["startTime"]))
+        xcen.append(float("%.2f" % hekJSON["Events"][i]["xCen"]))
+        ycen.append(float("%.2f" % hekJSON["Events"][i]["yCen"]))
+        xfov.append(float("%.2f" % hekJSON["Events"][i]["raster_fovx"]))
+        yfov.append(float("%.2f" % hekJSON["Events"][i]["raster_fovy"]))
+        sciObj.append(hekJSON["Events"][i]["sciObjectives"])
 
-def getInfoHMI(index, JSOC_Dict, noaaNmbr):
-    temp = []
-    counter = 0
+def getInfoHMI(dateOfObsHEK, JSOC_Dict, noaaNmbr):
+    filteredJSOCDict = []
     for i in range(len(JSOC_Dict)-1):
         if JSOC_Dict[i][0] == noaaNmbr:
-            temp.append(JSOC_Dict[i])
-            counter = counter+1
-    a = findClosestEntry(index, temp)
+            filteredJSOCDict.append(JSOC_Dict[i])
+    # Filters HARP Data observations to just the specific noaaNmbr
+
+    a = findClosestEntry(dateOfObsHEK, filteredJSOCDict)
 
     dateAndTimeHMI.append(convertTimesHMI(temp[a][1]))
-    latMin.append(float("%.2f" % float(temp[a][2])))
-    lonMin.append(float("%.2f" % float(temp[a][3])))
-    latMax.append(float("%.2f" % float(temp[a][4])))
-    lonMax.append(float("%.2f" % float(temp[a][5])))
+    latMin.append(float("%.2f" % (temp[a][2])))
+    lonMin.append(float("%.2f" % (temp[a][3])))
+    latMax.append(float("%.2f" % (temp[a][4])))
+    lonMax.append(float("%.2f" % (temp[a][5])))
 
     min = HGToHPC(lonMin[index], latMin[index], dateAndTimeHMI[index])
     max = HGToHPC(lonMax[index], latMax[index], dateAndTimeHMI[index])
@@ -171,19 +171,14 @@ def setUpperTimeBound(i):
     upperBound = dateAndTimeHEK[i] + datetime.timedelta(hours=1)
     return upperBound
 
-def findClosestEntry(index, JSOC_Dict):
-    difference1 = abs(dateAndTimeHEK[index]- convertTimesHMI(JSOC_Dict[0][1]))
+def findClosestEntry(dateOfObsHEK, filteredJSOCDict):
+    difference1 = abs(dateOfObsHEK- convertTimesHMI(JSOC_Dict[0][1]))
     cont = True
-    counter = 1
-    while cont:
-        try:
-            difference2 = abs(dateAndTimeHEK[index] - convertTimesHMI(JSOC_Dict[counter][1]))
-            if difference2 < difference1:
-                difference1 = difference2
-                closestIndex = counter
-            counter = counter+1
-        except IndexError:
-            cont = False
+    for i in range(1, len(filteredJSOCDict)-1):
+        difference2 = abs(dateOfObsHEK - convertTimesHMI(JSOC_Dict[i][1]))
+        if difference2 < difference1:
+            difference1 = difference2
+            closestIndex = i
     return closestIndex
 
 def HGToHPC(x, y, t):
@@ -300,24 +295,21 @@ def display(request, noaaNmbr):
     urlData = 'http://www.lmsal.com/hek/hcr?cmd=search-events3&outputformat=json&instrument=IRIS&noaanum=' + noaaNmbr + '&hasData=true'
 
     webUrl = urlopen(urlData)
-    counter = 0
     data = webUrl.read().decode('utf-8')
     hekJSON = json.loads(data)
     
-    getInfoHEK(counter, hekJSON)
-
-    if len(dateAndTimeHEK) == 0:
+    if len(hekJSON) == 0:
         return render(request, 'empty.html')
+    else:
+        getInfoHEK(hekJSON)
+        sortHEK()
 
-    sortHEK()
+        urlDataJSOC = 'http://jsoc.stanford.edu/cgi-bin/ajax/jsoc_info'
+        for i in range(len(dateAndTimeHEK)):
+            JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=setLowerTimeBound(i), end_or_span=setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX'])
+            getInfoHMI(dateAndTime[i], JSOC_Dict, noaaNmbr)
 
-    urlDataJSOC = 'http://jsoc.stanford.edu/cgi-bin/ajax/jsoc_info'
-    for i in range(len(dateAndTimeHEK)):
-        JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=setLowerTimeBound(i), end_or_span=setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX']) 
-        print(JSOC_Dict)
-        getInfoHMI(i, JSOC_Dict, noaaNmbr)
+        sortHMI()
 
-    sortHMI()
-
-    return render(request, 'display.html', {"Graph": makeGraph(noaaNmbr), "HEKTable": makeHEKTable(noaaNmbr), "HMITable": makeHMITable(noaaNmbr)})
+        return render(request, 'display.html', {"Graph": makeGraph(noaaNmbr), "HEKTable": makeHEKTable(noaaNmbr), "HMITable": makeHMITable(noaaNmbr)})
 
