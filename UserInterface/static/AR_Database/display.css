@@ -1,7 +1,11 @@
 div.Tables{
 	vertical-align: top;
+	max-height: 100%;
 	display:inline-block;
-    float:left;
+    float:right;
+    padding-left: 1cm;
+    position:fixed;
+    overflow-y: auto;
 }
 
 div.MPLD3_Graph{
@@ -10,3 +14,16 @@ div.MPLD3_Graph{
     float:left;	
 }
 
+table.sortable tbody {
+    counter-reset: sortabletablescope;
+}
+table.sortable thead tr::before {
+    content: "";
+    position:fixed;
+    display: table-cell;
+}
+table.sortable tbody tr::before {
+    content: counter(sortabletablescope);
+    counter-increment: sortabletablescope;
+    display: table-cell;
+}

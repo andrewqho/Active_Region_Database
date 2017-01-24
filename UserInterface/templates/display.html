@@ -24,7 +24,7 @@
             <script>
                 function hideCombined() {
                     var x = document.getElementById('Combined_Graph');
-                    var elem = document.getElementById("button1");
+                    var elem = document.getElementById("hideCombined");
         
                     if (x.style.display === 'none') {
                         elem.value = "Hide Graph";
@@ -37,7 +37,7 @@
                 }
                 function hideIRIS() {
                     var x = document.getElementById('IRIS_Graph');
-                    var elem = document.getElementById("button2");
+                    var elem = document.getElementById("hideIRIS");
 
                     if (x.style.display === 'none') {
                         elem.value = "Hide IRIS Graph";
@@ -50,7 +50,7 @@
                 }
                 function hideHMI() {
                     var x = document.getElementById('HMI_Graph');
-                    var elem = document.getElementById("button3");
+                    var elem = document.getElementById("hideHMI");
 
                     if (x.style.display === 'none') {
                         x.style.display = 'block';
@@ -70,7 +70,7 @@
                 </script>
             </div>
             <div id="hideCombined">
-                <button onclick="hideCombined()" id="button1">Hide/Show Graph</button>
+                <button onclick="hideCombined()" id="hideCombined">Hide/Show Graph</button>
             </div>
             <div id="IRIS_Graph">
                 <script type = "text/javascript">
@@ -79,7 +79,7 @@
                 </script>
             </div>
             <div id="hideIRIS">
-                <button onclick="hideIRIS()" id="button2">Hide/Show IRIS Graph</button>
+                <button onclick="hideIRIS()" id="hideIRIS">Hide/Show IRIS Graph</button>
             </div>
             <div id="HMI_Graph">
                 <script type = "text/javascript">
@@ -87,11 +87,11 @@
                     mpld3.draw_figure("HMI_Graph", HMI_Graph);
                 </script>
             </div>
-            <div style="padding-bottom: 2cm"id="hideHMI">
-                <button onclick="hideHMI()" id="button3">Hide/Show HMI Graph</button>
+            <div style="padding-bottom: 2cm" id="hideHMI">
+                <button onclick="hideHMI()" id="hideHMI">Hide/Show HMI Graph</button>
             </div>
         </div>
-        <div style="position:fixed" class="Tables">
+        <div class="Tables">
             <div id="IRIS_Table">
                 <h3>IRIS Observations</h3>
                 <table class='sortable'> 

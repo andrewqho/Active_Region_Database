@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 urlpatterns = [
-	url(r'^ActiveRegionDatabase/', include('User_Interface.urls')),
+	url(r'^ActiveRegionDatabase/', include('UserInterface.urls')),
 	url(r'^admin/', admin.site.urls)
 ]
 

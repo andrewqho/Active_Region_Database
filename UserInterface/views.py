@@ -22,7 +22,6 @@ from matplotlib.path import Path
 import numpy as np
 import pylab
 import sunpy.time
-import numpy as np
 from adjustText import adjust_text
 import pandas as pd
 from scipy import interpolate
@@ -30,10 +29,7 @@ import datetime
 from sunpy import wcs
 from sunpy import sun
 
-from .tables import HEK_Table
-
 from UserInterface import fetch
-
 
 from mpld3 import plugins
 from mpld3 import utils
@@ -43,14 +39,6 @@ from UserInterface import models
 import matplotlib.pyplot as plt, mpld3
 
 from django.views.decorators.csrf import csrf_exempt,csrf_protect
-
-# class ClickInfo(plugins.PluginBase):
-#     def __init__(self, HEKpoints, HEKcoordinates):
-#         self.HEKpoints = HEKpoints
-#         self.HEKcoordinates = HEKcoordinates
-#         self.dict_ = {"type": "clickinfo",
-#                       "id": utils.get_id(HEKpoints, "pts"),
-#                       "HEKcoordinates": HEKcoordinates}
 
 dateAndTimeHEK = []
 xcen = []
@@ -151,36 +139,23 @@ def sortHMI():
                 lonMax[j] = lonMax[j-1]
                 yfov[j-1]=temp5
 
-def createAnnotations(hekJSON, noaaNmbr):
-    annotations = []
-    for i in range(len(hekJSON['Events'])):
-        annotations.append(dateAndTimeHEK[i])
-        # annotations.append(dateAndTimeHEK[i] + ', ' + getLocation(i, noaaNmbr))
-
-    return annotations
-
 def fixAnnotations(annotations):
     texts = []
     for xt, yt, s in zip(xcen, ycen, annotations):
         texts.append(plt.text(xt, yt, s))
     return texts
 
-# def round_multiple(x, base):
-#     return int(base * round(float(x) / base)) 
-
-# def onclick(event):
-#     print( 'button=%d, x=%d, y=%d, xdata=%f, ydata=%f'%(
-#         event.button, event.x, event.y, event.xdata, event.ydata))
-
 def setLowerTimeBound(i):
-    lowerBound = dateAndTimeHEK[i] - datetime.timedelta(hours=1)
+    lowerBound = dateAndTimeHEK[i] - datetime.timedelta(hours=0.5)
     return lowerBound
 
 def setUpperTimeBound(i):
-    upperBound = dateAndTimeHEK[i] + datetime.timedelta(hours=1)
+    upperBound = dateAndTimeHEK[i] + datetime.timedelta(hours=0.5)
     return upperBound
 
 def findClosestEntry(index, JSOC_Dict):
+    print(dateAndTimeHEK[index])
+    print(JSOC_Dict[0][1])
     difference1 = abs(dateAndTimeHEK[index]- convertTimesHMI(JSOC_Dict[0][1]))
     cont = True
     counter = 1
@@ -222,18 +197,6 @@ def reset():
     del lonMax [:]
     del latMin [:]
     del latMax [:]
-
-# def makeGraph(noaaNmbr): 
-# #WORKING BASIC TOOLTIPS
-#     fig, ax = plt.subplots()
-#     points = ax.scatter(np.random.rand(50), np.random.rand(50),
-#                     s=500, alpha=0)
-
-#     plugins.connect(fig, ClickInfo(points))
-
-#     js_data = json.dumps(mpld3.fig_to_dict(fig))
-
-#     return js_data
 
 def makeIRISGraph(noaaNmbr):
     fig, ax = plt.subplots(figsize = (6,6))
@@ -305,9 +268,6 @@ def makeCombinedGraph(noaaNmbr):
         
         ax.add_patch(Rectangle((xStart, yStart), xLength, yLength, edgecolor = 'blue', facecolor='none'))
 
-    # plt.plot(xcen, ycen, 'ro', color = 'blue')
-    # circle = Circle((0, 0), 980 , facecolor='none', edgecolor=(0, 0.8, 0.8), linewidth=3, alpha=0.5)
-
     # ax.add_patch(circle)
     ax.add_patch(Circle((0, 0), 980 , facecolor='none', edgecolor=(0, 0.8, 0.8), linewidth=3, alpha=0.5))
     ax.set_xlabel('X-Cen (HPC Arcseconds)')
@@ -333,57 +293,16 @@ def makeCombinedGraph(noaaNmbr):
 
     return js_data
 
-# def makeGraph(noaaNmbr): WORKING
-#     fig, ax = plt.subplots(figsize=(8,8))
-#     # plt.plot(xcen, ycen, linestyle="dashed", color="red")
-#     # plt.plot(xcen, ycen, 'ro', color = 'blue')
-#     plt.plot(xcen, ycen, linestyle="dashed", color="red")
-#     plt.plot(xcen, ycen, 'ro', color = 'blue')
-#     # circle = Circle((0, 0), 980 , facecolor='none', edgecolor=(0, 0.8, 0.8), linewidth=3, alpha=0.5)
-
-#     for i in range(len(dateAndTimeHMI)):
-#         xStart = lonMin[i]
-#         yStart = latMin[i]
-        
-#         xLength = lonMax[i] - lonMin[i]
-#         yLength = latMax[i] - latMin[i]
-        
-#         ax.add_patch(Rectangle((xStart, yStart), xLength, yLength, edgecolor = 'blue', facecolor='none'))
-
-#     # ax.add_patch(circle)
-#     ax.add_patch(Circle((0, 0), 980 , facecolor='none', edgecolor=(0, 0.8, 0.8), linewidth=3, alpha=0.5))
-#     ax.set_xlabel('X-Cen (HPC Arcseconds)')
-#     ax.set_ylabel('Y-Cen (HPC Arcseconds)')
-
-
-#     # for i in range(len(hekJSON['Events'])):
-#     #     if xfov[i] != 0:
-#     #         xStart = xcen[i] - (xfov[i]/2)
-#     #         yStart = ycen[i] - (yfov[i]/2)
-#     #         ax.add_patch(Rectangle((xStart, yStart), xfov[i], yfov[i], facecolor='none'))
-
-#     # ax.grid(True)
-#     plt.axis('equal')
-
-#     ax.grid(True)
-#     plt.gca().set_aspect('equal', adjustable='box')
-
-#     ax.set_title("Active Region:" + " " + noaaNmbr, size=30)
-    
-#     js_data = json.dumps(mpld3.fig_to_dict(fig))
-
-#     return js_data
-
 def makeHEKTable(noaaNmbr):
     if models.HEK_Observations.objects.filter(noaaNmbr=noaaNmbr).count() == 0:
         for i in range(len(dateAndTimeHEK)):
             a = models.HEK_Observations(noaaNmbr=noaaNmbr, 
-                                                dateAndTime=dateAndTimeHEK[i], 
-                                                xcen=xcen[i], 
-                                                ycen=ycen[i], 
-                                                xfov=xfov[i], 
-                                                yfov=yfov[i], 
-                                                sciObj=sciObj[i])
+                                            dateAndTime=dateAndTimeHEK[i], 
+                                            xcen=xcen[i], 
+                                            ycen=ycen[i], 
+                                            xfov=xfov[i], 
+                                            yfov=yfov[i], 
+                                            sciObj=sciObj[i])
             a.save()
 
     table = models.HEK_Observations.objects.filter(noaaNmbr=noaaNmbr)
@@ -414,12 +333,12 @@ def empty(request, noaaNmbr):
 def display(request, noaaNmbr):
     reset()
 
-    urlData = 'http://www.lmsal.com/hek/hcr?cmd=search-events3&outputformat=json&instrument=IRIS&noaanum=' + noaaNmbr + '&hasData=true'
+    HEKurlData = 'http://www.lmsal.com/hek/hcr?cmd=search-events3&outputformat=json&instrument=IRIS&noaanum=' + noaaNmbr + '&hasData=true'
 
-    webUrl = urlopen(urlData)
+    webUrl = urlopen(HEKurlData)
     counter = 0
-    data = webUrl.read().decode('utf-8')
-    hekJSON = json.loads(data)
+    HEKdata = webUrl.read().decode('utf-8')
+    hekJSON = json.loads(HEKdata)
     
     getInfoHEK(counter, hekJSON)
 
@@ -429,11 +348,10 @@ def display(request, noaaNmbr):
     sortHEK()
 
     urlDataJSOC = 'http://jsoc.stanford.edu/cgi-bin/ajax/jsoc_info'
-    for i in range(len(dateAndTimeHEK)):
+    for i in range(len(dateAndTimeHEK)-1):
         JSOC_Dict = fetch.fetch('hmi.sharp_720s[]', start=setLowerTimeBound(i), end_or_span=setUpperTimeBound(i), keys=['NOAA_AR','T_OBS','LAT_MIN','LON_MIN','LAT_MAX','LON_MAX']) 
         getInfoHMI(i, JSOC_Dict, noaaNmbr)
-
-    # print(JSOC_Dict)
+        
     sortHMI()
     return render(request, 'display.html', {"Combined_Graph": makeCombinedGraph(noaaNmbr), "IRIS_Graph": makeIRISGraph(noaaNmbr), "HMI_Graph": makeHMIGraph(noaaNmbr),"HEKTable": makeHEKTable(noaaNmbr), "HMITable": makeHMITable(noaaNmbr)})
 
